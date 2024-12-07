@@ -2,26 +2,45 @@
 
 # Import built-ins
 import os
+from typing import Iterable
 
-script_path = os.path.abspath(__file__)
-script_root = os.path.dirname(script_path)
-project_root = os.path.dirname(script_root)
+# Globals
+SCRIPT_PATH = os.path.abspath(__file__)
+SCRIPT_ROOT = os.path.dirname(SCRIPT_PATH)
+PROJECT_ROOT = os.path.dirname(SCRIPT_ROOT)
 
-data_file = os.path.join(project_root, "data", "distances.txt")
+def read_data_file(filename: str) -> str:
+    _data_file = os.path.join(PROJECT_ROOT, "data", filename)
+    with open(_data_file, mode="r") as _file:
+        return _file.read()
 
-left_column:list = []
-right_column:list = []
-with open(data_file) as data:
-    for line in data:
-        left_datum, right_datum = line.strip().split()
-        left_column.append(int(left_datum))
-        right_column.append(int(right_datum))
 
-left_column.sort()
-right_column.sort()
-total_difference: int = sum(abs(left_datum - right_datum) for left_datum, right_datum in zip(left_column, right_column))
+def extract_columns(corpus: str) -> tuple[list, list]:
+    _left_column: list[int] = []
+    _right_column: list[int] = []
+    for _line in corpus.splitlines():
+        _left_datum, _right_datum = _line.strip().split()
+        _left_column.append(int(_left_datum))
+        _right_column.append(int(_right_datum))
+    return _left_column, _right_column
 
-print("\n",
-      "Part 1\n",
-      "------\n",
-      f"The total difference of distances between lists is equal to {total_difference:,} units.")
+
+def create_sorted_pairs(first_column: list[int], second_column: list[int]) -> Iterable[tuple[int, int]]:
+    first_column.sort()
+    second_column.sort()
+    return zip(first_column, second_column)
+
+
+def sum_distance_differences(pairs: Iterable[tuple[int, int]]) -> int:
+    return sum(abs(_left_datum - _right_datum) for _left_datum, _right_datum in pairs)
+
+
+contents = read_data_file("distances.txt")
+left_column, right_column = extract_columns(contents)
+sorted_pairs = create_sorted_pairs(left_column, right_column)
+total_difference = sum_distance_differences(sorted_pairs)
+
+print(f"""
+Part 1
+------
+The total difference of distances between lists is equal to {total_difference:,} units.""")
