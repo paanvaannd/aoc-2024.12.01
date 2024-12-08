@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Import built-ins
+from collections import Counter
 import copy
 import os
 from typing import Iterable
@@ -44,6 +45,12 @@ left_column, right_column = extract_columns(contents)
 sorted_pairs = create_sorted_pairs(left_column, right_column)
 total_difference = sum_distance_differences(sorted_pairs)
 
+number_of_occurrences = Counter(right_column)
+similarity_index = sum(map(lambda k: k * number_of_occurrences[k], left_column))
+
 print("\nPart 1\n------")
 print("The total difference of distances between lists is equal to "
       f"{total_difference:,} units.")
+
+print("\nPart 2\n------")
+print(f"The similarity index of the columns is {similarity_index:,}.")
